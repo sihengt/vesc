@@ -58,9 +58,6 @@ VescDriver::VescDriver(ros::NodeHandle nh,
     ros::shutdown();
     return;
   }
-
-  if (private_nh.getParam("can_id", can_id_))
-    ROS_INFO("Communicating with can_id = %d", can_id_);
   
   // attempt to connect to the serial port
   try
@@ -231,14 +228,18 @@ void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
  *              driver. However, note that the VESC may impose a more restrictive bounds on the
  *              range depending on its configuration.
  */
-void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
+void VescDriver::speedCallback(const vesc_msgs::VescCommand::ConstPtr& speed)
 {
+  ROS_DEBUG("Received speed callback.");
   if (driver_mode_ == MODE_OPERATING)
   {
-    if (can_id_ > 0)
-      vesc_.setSpeed(speed_limit_.clip(speed->data), can_id_);
+    if (speed->can_id > 0)
+    {
+      ROS_DEBUG("Setting speed with can_id");
+      vesc_.setSpeed(speed_limit_.clip(speed->command), speed->can_id);
+    }
     else
-      vesc_.setSpeed(speed_limit_.clip(speed->data));
+      vesc_.setSpeed(speed_limit_.clip(speed->command));
   }
 }
 

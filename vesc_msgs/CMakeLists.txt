@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
+  VescCommand.msg
   VescState.msg
   VescStateStamped.msg
 )

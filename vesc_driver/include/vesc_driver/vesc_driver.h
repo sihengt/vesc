@@ -37,6 +37,7 @@
 
 #include "vesc_driver/vesc_interface.h"
 #include "vesc_driver/vesc_packet.h"
+#include "vesc_msgs/VescCommand.h"
 
 namespace vesc_driver
 {
@@ -95,15 +96,12 @@ private:
   int fw_version_major_;                ///< firmware major version reported by vesc
   int fw_version_minor_;                ///< firmware minor version reported by vesc
   
-  // Optional
-  int can_id_ = -1;
-
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);
   void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
   void currentCallback(const std_msgs::Float64::ConstPtr& current);
   void brakeCallback(const std_msgs::Float64::ConstPtr& brake);
-  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
+  void speedCallback(const vesc_msgs::VescCommand::ConstPtr& speed);
   void positionCallback(const std_msgs::Float64::ConstPtr& position);
   void servoCallback(const std_msgs::Float64::ConstPtr& servo);
 };
