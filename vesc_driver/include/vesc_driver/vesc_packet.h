@@ -97,6 +97,7 @@ public:
 
 protected:
   VescPacket(const std::string& name, int payload_size, int payload_id);
+  VescPacket(const std::string& name, int payload_size, int payload_id, int can_id);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
 
 private:
@@ -193,6 +194,7 @@ class VescPacketSetRPM : public VescPacket
 {
 public:
   explicit VescPacketSetRPM(double rpm);
+  explicit VescPacketSetRPM(double rpm, int can_id);
 
   //  double rpm() const;
 };

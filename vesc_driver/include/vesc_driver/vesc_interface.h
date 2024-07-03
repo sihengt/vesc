@@ -116,6 +116,7 @@ public:
   void setCurrent(double current);
   void setBrake(double brake);
   void setSpeed(double speed);
+  void setSpeed(double speed, int can_id);
   void setPosition(double position);
   void setServo(double servo);
 

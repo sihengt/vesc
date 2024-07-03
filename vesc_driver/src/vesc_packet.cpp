@@ -89,6 +89,17 @@ VescPacket::VescPacket(const std::string& name, int payload_size, int payload_id
   *payload_.first = payload_id;
 }
 
+VescPacket::VescPacket(const std::string& name, int payload_size, int payload_id, int can_id) :
+  VescFrame(payload_size), name_(name)
+{
+  assert(payload_id >= 0 && payload_id < 256);
+  assert(can_id >= 0 && can_id < 256);
+  assert(std::distance(payload_.first, payload_.second) > 0);
+  *payload_.first = 34;
+  *(payload_.first + 1) = can_id;
+  *(payload_.first + 2) = payload_id;
+}
+
 VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw) :
   VescFrame(*raw), name_(name)
 {
@@ -322,6 +333,22 @@ VescPacketSetRPM::VescPacketSetRPM(double rpm) :
   *(payload_.first + 2) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 16) & 0xFF);
   *(payload_.first + 3) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 8) & 0xFF);
   *(payload_.first + 4) = static_cast<uint8_t>(static_cast<uint32_t>(v) & 0xFF);
+
+  uint16_t crc = CRC::Calculate(
+    &(*payload_.first), std::distance(payload_.first, payload_.second), VescFrame::CRC_TYPE);
+  *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
+  *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+}
+
+VescPacketSetRPM::VescPacketSetRPM(double rpm, int can_id) :
+  VescPacket("SetRPM", 7, COMM_SET_RPM, can_id)
+{
+  int32_t v = static_cast<int32_t>(rpm);
+
+  *(payload_.first + 3) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 24) & 0xFF);
+  *(payload_.first + 4) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 16) & 0xFF);
+  *(payload_.first + 5) = static_cast<uint8_t>((static_cast<uint32_t>(v) >> 8) & 0xFF);
+  *(payload_.first + 6) = static_cast<uint8_t>(static_cast<uint32_t>(v) & 0xFF);
 
   uint16_t crc = CRC::Calculate(
     &(*payload_.first), std::distance(payload_.first, payload_.second), VescFrame::CRC_TYPE);

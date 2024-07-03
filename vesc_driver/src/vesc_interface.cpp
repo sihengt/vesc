@@ -263,6 +263,11 @@ void VescInterface::setSpeed(double speed)
   send(VescPacketSetRPM(speed));
 }
 
+void VescInterface::setSpeed(double speed, int can_id)
+{
+  send(VescPacketSetRPM(speed, can_id));
+}
+
 void VescInterface::setPosition(double position)
 {
   send(VescPacketSetPos(position));

@@ -59,6 +59,9 @@ VescDriver::VescDriver(ros::NodeHandle nh,
     return;
   }
 
+  if (private_nh.getParam("can_id", can_id_))
+    ROS_INFO("Communicating with can_id = %d", can_id_);
+  
   // attempt to connect to the serial port
   try
   {
@@ -232,7 +235,10 @@ void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
 {
   if (driver_mode_ == MODE_OPERATING)
   {
-    vesc_.setSpeed(speed_limit_.clip(speed->data));
+    if (can_id_ > 0)
+      vesc_.setSpeed(speed_limit_.clip(speed->data), can_id_);
+    else
+      vesc_.setSpeed(speed_limit_.clip(speed->data));
   }
 }
 
